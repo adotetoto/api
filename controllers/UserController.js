@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const bcrypt = require("bcrypt");
 module.exports = class UserController {
   static async register(req, res) {
     const { name, email, phone, password, confirmpassword } = req.body;
@@ -34,12 +35,41 @@ module.exports = class UserController {
     }
 
     //* validação se o usuário existe
-    const userExists = User.findOne({ email: email });
+    const userExists = await User.findOne({ email: email });
     if (userExists) {
       res
         .status(422)
         .json({ message: "Email já utilizado,por favor informe outro e-mail" });
       return;
+    }
+
+    /* 
+      Criptografando a senha
+      1- definir um salt de 10 caracters
+      2 - salvando a senha = atribuindo o salt e a senha
+    */
+
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    // criar um novo objeto para popular os dados vindo da req instancia o model
+    const user = new User({
+      name,
+      email,
+      phone,
+      password: passwordHash,
+    });
+
+    // para fazer algum salvamento no banco é aconselhavel usar try catch,pois depende de questões externas
+
+    try {
+      const newUser = await user.save();
+      res.status(500).json({
+        message: "Usuário adicionado com sucesso",
+        newUser,
+      });
+    } catch (error) {
+      res.status(500).json({ message: error });
     }
   }
 };

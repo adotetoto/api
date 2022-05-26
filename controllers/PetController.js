@@ -87,4 +87,18 @@ module.exports = class PetController {
       pets,
     });
   }
+  static async getAllUserAdoptions(req, res) {
+    // resgatar o token
+    const token = getToken(req);
+
+    //retornar o usuario descriptografando o token
+    const user = await getUserByToken(token);
+
+    // resgatando todos os pets do usuario,utilizando o id do token para buscar ou seja resgatando pela "referencia"
+    const pets = await Pet.find({ "adopter._id": user._id }).sort("-createdAt");
+
+    res.status(200).json({
+      pets,
+    });
+  }
 };

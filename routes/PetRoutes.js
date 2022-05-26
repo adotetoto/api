@@ -3,6 +3,12 @@ const PetController = require("../controllers/PetController");
 
 //? VERIFICAÇÃO DE AUTENTICAÇÃO
 const verifytoken = require("../helpers/verify-token");
-router.post("/create", verifytoken, PetController.create);
+const { imageUpload } = require("../helpers/image-upload");
+router.post(
+  "/create",
+  verifytoken,
+  imageUpload.array("images"),
+  PetController.create
+);
 
 module.exports = router;

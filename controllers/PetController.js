@@ -147,4 +147,66 @@ module.exports = class PetController {
     await Pet.findByIdAndDelete(id);
     res.status(200).json({ message: "Pet removido com sucesso" });
   }
+
+  static async updatePet(req, res) {
+    const id = req.params.id;
+
+    const { name, age, weight, color, available } = req.body;
+    const images = req.files;
+    const updateData = {};
+    const pet = await Pet.findOne({ _id: id });
+    //validações
+    if (!name) {
+      res.status(422).json({ message: "O nome é obrigátorio" });
+      return;
+    } else {
+      updateData.name = name;
+    }
+    if (!age) {
+      res.status(422).json({ message: "A idade é obrigátoria" });
+      return;
+    } else {
+      updateData.age = age;
+    }
+    if (!weight) {
+      res.status(422).json({ message: "O peso é obrigátorio" });
+      return;
+    } else {
+      updateData.weight = weight;
+    }
+    if (!color) {
+      res.status(422).json({ message: "A cor é obrigátoria" });
+      return;
+    } else {
+      updateData.color = color;
+    }
+    if (images.length === 0) {
+      res.status(422).json({ message: "A imagem é obrigatória" });
+      return;
+    } else {
+      updateData.images = [];
+      images.map((image) => {
+        updateData.images.push(image.filename);
+      });
+    }
+
+    if (!pet) {
+      res.status(404).json({ message: "Pet não encontrado!" });
+      return;
+    }
+
+    // check if user registered this pet
+    const token = getToken(req);
+    const user = await getUserByToken(token);
+
+    if (pet.user._id.toString() != user._id.toString()) {
+      res.status(404).json({
+        message: "Tente novamente mais tarde!",
+      });
+      return;
+    }
+
+    await Pet.findByIdAndUpdate(id, updateData);
+    res.status(200).json({ message: "Pet atualizado com sucesso" });
+  }
 };

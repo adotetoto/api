@@ -7,7 +7,8 @@ const getToken = require("../helpers/get-token");
 const getUserByToken = require("../helpers/get-user-by-token");
 module.exports = class UserController {
   static async register(req, res) {
-    const { name, email, phone, password, confirmpassword } = req.body;
+    const { name, email, phone, city, address, password, confirmpassword } =
+      req.body;
 
     //* validações de campos digitados
     if (!name) {
@@ -21,6 +22,14 @@ module.exports = class UserController {
     }
     if (!phone) {
       res.status(422).json({ message: "O telefone  é obrigatorio" });
+      return;
+    }
+    if (!city) {
+      res.status(422).json({ message: "A cidade é obrigatoria" });
+      return;
+    }
+    if (!address) {
+      res.status(422).json({ message: "O endereço é obrigatoria" });
       return;
     }
     if (!password) {
@@ -63,6 +72,8 @@ module.exports = class UserController {
       name,
       email,
       phone,
+      city,
+      address,
       password: passwordHash,
     });
 
@@ -143,7 +154,8 @@ module.exports = class UserController {
 
     const token = getToken(req);
     const user = await getUserByToken(token);
-    const { name, email, phone, password, confirmpassword } = req.body;
+    const { name, email, phone, city, andress, password, confirmpassword } =
+      req.body;
 
     if (req.file) {
       user.image = req.file.filename;
@@ -173,6 +185,18 @@ module.exports = class UserController {
       return;
     }
     user.phone = phone;
+
+    if (!city) {
+      res.status(422).json({ message: "A cidade é obrigatoria" });
+      return;
+    }
+    user.city = city;
+
+    if (!andress) {
+      res.status(422).json({ message: "O endereço é obrigatorio" });
+      return;
+    }
+    user.andress = andress;
 
     if (password != confirmpassword) {
       res.status(422).json({ message: "As senhas não conferem" });

@@ -25,6 +25,16 @@ const User = db.model(
         type: String,
         required: true,
       },
+      //!modificado
+      city: {
+        type: String,
+        required: true,
+      },
+      //! modificado
+      address: {
+        type: String,
+        required: true,
+      },
     },
     { timestamps: true }
   )

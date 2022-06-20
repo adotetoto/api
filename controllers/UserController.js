@@ -154,7 +154,7 @@ module.exports = class UserController {
 
     const token = getToken(req);
     const user = await getUserByToken(token);
-    const { name, email, phone, city, andress, password, confirmpassword } =
+    const { name, email, phone, city, address, password, confirmpassword } =
       req.body;
 
     if (req.file) {
@@ -192,11 +192,11 @@ module.exports = class UserController {
     }
     user.city = city;
 
-    if (!andress) {
+    if (!address) {
       res.status(422).json({ message: "O endereço é obrigatorio" });
       return;
     }
-    user.andress = andress;
+    user.address = address;
 
     if (password != confirmpassword) {
       res.status(422).json({ message: "As senhas não conferem" });

@@ -28,6 +28,7 @@ module.exports = class UserController {
       res.status(422).json({ message: "A cidade é obrigatoria" });
       return;
     }
+
     if (!address) {
       res.status(422).json({ message: "O endereço é obrigatoria" });
       return;
@@ -189,8 +190,21 @@ module.exports = class UserController {
     if (!city) {
       res.status(422).json({ message: "A cidade é obrigatoria" });
       return;
+    } else {
+      if (
+        city === "Porto Alegre" ||
+        city === "Viamao" ||
+        city === "Canoas" ||
+        city === "Gravatai" ||
+        city === "Cachoeirinha" ||
+        city === "Esteio"
+      ) {
+        user.city = city;
+      } else {
+        res.status(422).json({ message: "Selecione alguma cidade" });
+        return;
+      }
     }
-    user.city = city;
 
     if (!address) {
       res.status(422).json({ message: "O endereço é obrigatorio" });

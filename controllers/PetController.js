@@ -7,7 +7,7 @@ const ObjectId = require("mongoose").Types.ObjectId;
 module.exports = class PetController {
   //? CRIANDO PET
   static async create(req, res) {
-    const { name, age, weight, color } = req.body;
+    const { name, age, weight, size, description, sex, color } = req.body;
     const images = req.files;
     const available = true;
 
@@ -22,14 +22,38 @@ module.exports = class PetController {
       res.status(422).json({ message: "A idade é obrigátoria" });
       return;
     }
+    if (age < 0) {
+      res.status(422).json({ message: "A idade deve ser maior que 0" });
+      return;
+    }
     if (!weight) {
       res.status(422).json({ message: "O peso é obrigátorio" });
+      return;
+    }
+    if (weight <= 0) {
+      res.status(422).json({ message: "O peso é menor ou igual a zero" });
       return;
     }
     if (!color) {
       res.status(422).json({ message: "A cor é obrigátoria" });
       return;
     }
+
+    if (!size) {
+      res.status(422).json({ message: "O porte é obrigátorio" });
+      return;
+    }
+
+    if (!sex) {
+      res.status(422).json({ message: "O sexo é obrigátorio" });
+      return;
+    }
+
+    if (!description) {
+      res.status(422).json({ message: "A descrição é obrigátoria" });
+      return;
+    }
+
     if (images.length === 0) {
       res.status(422).json({ message: "A imagem é obrigatória" });
       return;
@@ -43,6 +67,9 @@ module.exports = class PetController {
       age,
       weight,
       color,
+      sex,
+      size,
+      description,
       available,
       images: [],
       //definindo usuario puxando os dados pelo usuário descodificado
@@ -51,6 +78,8 @@ module.exports = class PetController {
         name: user.name,
         image: user.image,
         phone: user.phone,
+        city: user.city,
+        address: user.address,
       },
     });
     images.map((image) => {
@@ -151,7 +180,8 @@ module.exports = class PetController {
   static async updatePet(req, res) {
     const id = req.params.id;
 
-    const { name, age, weight, color, available } = req.body;
+    const { name, age, weight, color, size, sex, description, available } =
+      req.body;
     const images = req.files;
     const updateData = {};
     const pet = await Pet.findOne({ _id: id });
@@ -166,45 +196,103 @@ module.exports = class PetController {
       res.status(422).json({ message: "A idade é obrigátoria" });
       return;
     } else {
-      updateData.age = age;
+      if (age < 0) {
+        res.status(422).json({ message: "A idade deve ser maior que 0 " });
+        return;
+      } else {
+        updateData.age = age;
+      }
     }
     if (!weight) {
-      res.status(422).json({ message: "O peso é obrigátorio" });
+      res
+        .status(422)
+        .json({ message: "O peso é obrigátorio e ele deve ser maior que 0" });
       return;
     } else {
-      updateData.weight = weight;
+      if (weight <= 0) {
+        res.status(422).json({ message: "O peso é menor ou igual a zero" });
+        return;
+      } else {
+        updateData.weight = weight;
+      }
     }
     if (!color) {
       res.status(422).json({ message: "A cor é obrigátoria" });
       return;
     } else {
-      updateData.color = color;
-    }
-    if (images.length > 0) {
-      updateData.images = [];
-      images.map((image) => {
-        updateData.images.push(image.filename);
-      });
-    }
+      if (
+        color === "Branco" ||
+        color === "Preto" ||
+        color === "Cinza" ||
+        color === "Caramelo" ||
+        color === "Mesclado"
+      ) {
+        updateData.color = color;
+      } else {
+        res
+          .status(422)
+          .json({ message: "A cor informada não foi cadastrada no sistema" });
+        return;
+      }
+      if (!size) {
+        res.status(422).json({ message: "O porte é obrigátorio" });
+        return;
+      } else {
+        if (size === "Pequeno" || size === "Medio" || size === "Grande") {
+          updateData.size = size;
+        } else {
+          res
+            .status(422)
+            .json({ message: "O porte deve ser Pequeno,Médio ou Grande" });
+          return;
+        }
+      }
 
-    if (!pet) {
-      res.status(404).json({ message: "Pet não encontrado!" });
-      return;
+      //! REFERENCIA VALIDAÇÕES SELECT
+      if (!sex) {
+        res.status(422).json({ message: "O sexo é obrigátorio" });
+        return;
+      } else {
+        if (sex === "Macho" || sex === "Femea") {
+          updateData.sex = sex;
+        } else {
+          res.status(422).json({ message: "O sexo deve ser Macho ou Femea" });
+          return;
+        }
+      }
+      if (!description) {
+        res.status(422).json({ message: "A descrição é obrigátoria" });
+        return;
+      } else {
+        updateData.description = description;
+      }
+
+      if (images.length > 0) {
+        updateData.images = [];
+        images.map((image) => {
+          updateData.images.push(image.filename);
+        });
+      }
+
+      if (!pet) {
+        res.status(404).json({ message: "Pet não encontrado!" });
+        return;
+      }
+
+      // check if user registered this pet
+      const token = getToken(req);
+      const user = await getUserByToken(token);
+
+      if (pet.user._id.toString() != user._id.toString()) {
+        res.status(404).json({
+          message: "Tente novamente mais tarde!",
+        });
+        return;
+      }
+
+      await Pet.findByIdAndUpdate(id, updateData);
+      res.status(200).json({ message: "Pet atualizado com sucesso" });
     }
-
-    // check if user registered this pet
-    const token = getToken(req);
-    const user = await getUserByToken(token);
-
-    if (pet.user._id.toString() != user._id.toString()) {
-      res.status(404).json({
-        message: "Tente novamente mais tarde!",
-      });
-      return;
-    }
-
-    await Pet.findByIdAndUpdate(id, updateData);
-    res.status(200).json({ message: "Pet atualizado com sucesso" });
   }
 
   static async schedule(req, res) {

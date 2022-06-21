@@ -18,7 +18,20 @@ const Pet = db.model(
         type: Number,
         required: true,
       },
+
       color: {
+        type: String,
+        required: true,
+      },
+      size: {
+        type: String,
+        required: true,
+      },
+      sex: {
+        type: String,
+        required: true,
+      },
+      description: {
         type: String,
         required: true,
       },

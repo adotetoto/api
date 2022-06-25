@@ -337,6 +337,82 @@ module.exports = class PetController {
     });
   }
 
+  //! FILTROS DE SEXO
+  static async getSexMale(req, res) {
+    const pets = await Pet.find({ sex: "Macho" }).sort("-createAt");
+    res.status(200).json({
+      pets: pets,
+    });
+  }
+  static async getSexFemale(req, res) {
+    const pets = await Pet.find({ sex: "Fêmea" }).sort("-createAt");
+    res.status(200).json({
+      pets: pets,
+    });
+  }
+
+  //! FILTROS DE CIDADE
+  static async getCityPortoAlegre(req, res) {
+    const pets = await Pet.find({ "user.city": "Porto Alegre" }).sort(
+      "-createAt"
+    );
+    res.status(200).json({
+      pets: pets,
+    });
+  }
+  static async getCityViamao(req, res) {
+    const pets = await Pet.find({ "user.city": "Viamão" }).sort("-createAt");
+    res.status(200).json({
+      pets: pets,
+    });
+  }
+  static async getCityCanoas(req, res) {
+    const pets = await Pet.find({ "user.city": "Canoas" }).sort("-createAt");
+    res.status(200).json({
+      pets: pets,
+    });
+  }
+  static async getCityGravatai(req, res) {
+    const pets = await Pet.find({ "user.city": "Gravatai" }).sort("-createAt");
+    res.status(200).json({
+      pets: pets,
+    });
+  }
+  static async getCityCachoeirinha(req, res) {
+    const pets = await Pet.find({ "user.city": "Cachoeirinha" }).sort(
+      "-createAt"
+    );
+    res.status(200).json({
+      pets: pets,
+    });
+  }
+  static async getCityEsteio(req, res) {
+    const pets = await Pet.find({ "user.city": "Esteio" }).sort("-createAt");
+    res.status(200).json({
+      pets: pets,
+    });
+  }
+
+  //!FILTROS DE PORTE
+  static async getSizeSmall(req, res) {
+    const pets = await Pet.find({ size: "Pequeno" }).sort("-createAt");
+    res.status(200).json({
+      pets: pets,
+    });
+  }
+  static async getSizeMedium(req, res) {
+    const pets = await Pet.find({ size: "Médio" }).sort("-createAt");
+    res.status(200).json({
+      pets: pets,
+    });
+  }
+  static async getSizeGreat(req, res) {
+    const pets = await Pet.find({ size: "Grande" }).sort("-createAt");
+    res.status(200).json({
+      pets: pets,
+    });
+  }
+
   // concluindo adoção
   static async concludeAdoption(req, res) {
     const id = req.params.id;

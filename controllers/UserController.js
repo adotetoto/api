@@ -24,6 +24,19 @@ module.exports = class UserController {
       res.status(422).json({ message: "O telefone  é obrigatorio" });
       return;
     }
+    ///\(\d\d\)\d\d\d\d\d-\d\d\d\d/;
+    const testRegex = /\d\d\d\d\d\d\d\d\d\d\d\d/;
+    let str = phone;
+    const regex = new RegExp(testRegex, "g");
+
+    if (!regex.exec(str)) {
+      console.log(regex.exec(str));
+      res.status(422).json({
+        message:
+          "O telefone  deve estar no formato ddddddddddd - 051985003855 por exemplo ",
+      });
+      return;
+    }
     if (!city) {
       res.status(422).json({ message: "A cidade é obrigatoria" });
       return;

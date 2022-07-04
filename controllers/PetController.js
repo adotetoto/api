@@ -23,7 +23,12 @@ module.exports = class PetController {
       return;
     }
     if (age < 0) {
-      res.status(422).json({ message: "A idade deve ser maior que 0" });
+      res
+        .status(422)
+        .json({
+          message:
+            " A idade deve ser maior que 0 ou igual para pets que tem meses ",
+        });
       return;
     }
     if (!weight) {
@@ -197,7 +202,10 @@ module.exports = class PetController {
       return;
     } else {
       if (age < 0) {
-        res.status(422).json({ message: "A idade deve ser maior que 0 " });
+        res.status(422).json({
+          message:
+            "A idade deve ser maior que 0 ou igual para pets que tem meses ",
+        });
         return;
       } else {
         updateData.age = age;
